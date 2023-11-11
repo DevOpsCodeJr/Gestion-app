@@ -7,7 +7,7 @@ const UserSchema = Schema({
   },
   surname: String,
   dni: {
-    type: Number,
+    type: String,
     required: true,
   },
   email: {

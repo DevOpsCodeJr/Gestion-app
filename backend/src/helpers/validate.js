@@ -9,9 +9,7 @@ const validateUser = (params) => {
     validator.isLength(params.name, { min: 3, max: undefined }) &&
     validator.isAlpha(params.name, "es_ES");
 
-  let surname =
-    !validator.isEmpty(params.surname) &&
-    validator.isLength(params.surname, { min: 3, max: undefined }) &&
+  let surname = validator.isLength(params.surname, { min: 3, max: undefined }) &&
     validator.isAlpha(params.surname, "es_ES");
 
   let email =
