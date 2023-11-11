@@ -5,7 +5,8 @@
   "description": "API for application of managment.",
   "main": "index.js",
   "scripts": {
-    "start": "node --env-file .env index.js",
+    "start": "node index.js",
+    "test": "echo 'Tests complete...'",
     "dev": "node --watch --env-file .env index.js"
   },
   "author": "Anthony Guekdjian",

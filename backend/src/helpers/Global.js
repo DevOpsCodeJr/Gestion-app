@@ -89,7 +89,7 @@ export const Global = {
     },
   },
   database: {
-    URI: `mongodb+srv://${process.env.USER_DB}:${process.env.PASSWORD_DB}@${process.env.NAME_DB}.sshngvr.mongodb.net/?retryWrites=true&w=majority`,
+    URI: `mongodb+srv://${process.env.USER_DB}:${process.env.PASSWORD_DB}@${process.env.NAME_DB}.1zassia.mongodb.net/?retryWrites=true&w=majority`,
     stateConnectionDB: {
       SUCCESS: `Conexion exitosa a base de datos: ${process.env.NAME_DB}!`,
       ERROR: "Error al conectarse a la base de datos!",
