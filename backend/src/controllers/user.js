@@ -13,13 +13,13 @@ const register = (req, res) => {
     return res.status(statusCode.data.ERROR.code).json(statusCode.data.ERROR);
   }
 
-  // try {
-  //   validateUser(params);
-  // } catch (e) {
-  //   return res
-  //     .status(validations.user.validation.ERROR.code)
-  //     .json(validations.user.validation.ERROR);
-  // }
+  try {
+    validateUser(params);
+  } catch (e) {
+    return res
+      .status(validations.user.validation.ERROR.code)
+      .json(validations.user.validation.ERROR);
+  }
 
   User.find({
     $or: [{ email: params.email.toLowerCase() }],
