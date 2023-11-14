@@ -9,6 +9,7 @@ const createToken = (user) => {
     name: user.name,
     surname: user.surname,
     email: user.email,
+    phone: user.phone,
     role: user.role,
     iat: moment().unix(),
     exp: moment().add(1, "days").unix(),

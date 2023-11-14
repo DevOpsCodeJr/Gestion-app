@@ -87,8 +87,78 @@ export const Global = {
         message: "Error al guardar el ususario",
       },
     },
+    client: {
+      EXISTS: {
+        code: 200,
+        status: "success",
+        message: "El cliente ya existe",
+      },
+      NOTEXISTS: {
+        code: 400,
+        status: "error",
+        message: "No existe el cliente!",
+      },
+      update: {
+        ERROR: {
+          code: 400,
+          status: "error",
+          message: "Error al actualizar cliente!",
+        },
+        SUCCESS: {
+          code: 200,
+          status: "success",
+          message: "Cliente actualizado correctamente!",
+        },
+      },
+      SUCCESS: {
+        code: 200,
+        status: "success",
+        message: "Cliente registrado correctamente",
+      },
+      ERROR: {
+        code: 500,
+        status: "error",
+        message: "Error al guardar el cliente",
+      },
+    },
+    task: {
+      EXISTS: {
+        code: 200,
+        status: "success",
+        message: "La orden de servicio ya existe!",
+      },
+      NOTEXISTS: {
+        code: 400,
+        status: "error",
+        message: "No existe la orden de servicio!",
+      },
+      update: {
+        ERROR: {
+          code: 400,
+          status: "error",
+          message: "Error al actualizar orden de servicio!",
+        },
+        SUCCESS: {
+          code: 200,
+          status: "success",
+          message: "Orden de servicio actualizada correctamente!",
+        },
+      },
+      SUCCESS: {
+        code: 200,
+        status: "success",
+        message: "Orden de servicio creada correctamente!",
+      },
+      ERROR: {
+        code: 500,
+        status: "error",
+        message: "Error al crear orden de servicio!",
+      },
+    },
   },
   database: {
+    localURI:
+      "mongodb+srv://userdev:b5a1453zxk@gestion-app.1zassia.mongodb.net/?retryWrites=true&w=majority",
     URI: `mongodb+srv://${process.env.USER_DB}:${process.env.PASSWORD_DB}@${process.env.NAME_DB}.1zassia.mongodb.net/?retryWrites=true&w=majority`,
     stateConnectionDB: {
       SUCCESS: `Conexion exitosa a base de datos: ${process.env.NAME_DB}!`,
@@ -101,6 +171,20 @@ export const Global = {
         code: 500,
         status: "error",
         message: "Error en la consulta de usuarios.",
+      },
+    },
+    task: {
+      ERROR: {
+        code: 500,
+        status: "error",
+        message: "Error en la consulta de ordenes de servicio.",
+      },
+    },
+    client: {
+      ERROR: {
+        code: 500,
+        status: "error",
+        message: "Error en la consulta de clientes.",
       },
     },
   },

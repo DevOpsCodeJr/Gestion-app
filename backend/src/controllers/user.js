@@ -1,12 +1,11 @@
 import bcrypt from "bcrypt";
 import { createToken } from "../services/jwt.js";
 import User from "../models/user.js";
-import { validateUser } from "../helpers/validate.js";
 import { Global } from "../helpers/Global.js";
 
 const { statusCode, validations, querys } = Global;
 
-const register = (req, res) => {
+const register = async (req, res) => {
   let params = req.body;
 
   if (!params.name || !params.email || !params.password || !params.dni) {
@@ -14,20 +13,11 @@ const register = (req, res) => {
   }
 
   try {
-    validateUser(params);
-  } catch (e) {
-    return res
-      .status(validations.user.validation.ERROR.code)
-      .json(validations.user.validation.ERROR);
-  }
+    const existingUser = await User.findOne({
+      $or: [{ email: params.email.toLowerCase() }],
+    });
 
-  User.find({
-    $or: [{ email: params.email.toLowerCase() }],
-  }).exec(async (error, users) => {
-    if (error)
-      return res.status(querys.user.ERROR.code).json(querys.user.ERROR);
-
-    if (users && users.length >= 1) {
+    if (existingUser) {
       return res
         .status(validations.user.EXISTS.code)
         .send(validations.user.EXISTS);
@@ -37,42 +27,45 @@ const register = (req, res) => {
     params.password = pwd;
 
     let user_to_save = new User(params);
+    let userStored = await user_to_save.save();
 
-    user_to_save.save((error, userStored) => {
-      if (error || !userStored)
-        return res
-          .status(validations.user.ERROR.code)
-          .send(validations.user.ERROR);
+    if (!userStored) {
+      return res
+        .status(validations.user.ERROR.code)
+        .json(validations.user.ERROR);
+    }
 
-      userStored.toObject();
-      delete userStored.password;
-      delete userStored.role;
+    userStored = userStored.toObject();
+    delete userStored.password;
+    delete userStored.role;
 
-      return res.status(validations.user.SUCCESS.code).json({
-        status: validations.user.SUCCESS.status,
-        message: validations.user.SUCCESS.message,
-        user: userStored,
-      });
+    return res.status(validations.user.SUCCESS.code).json({
+      status: validations.user.SUCCESS.status,
+      message: validations.user.SUCCESS.message,
+      user: userStored,
     });
-  });
+  } catch (error) {
+    return res.status(querys.user.ERROR.code).json(querys.user.ERROR);
+  }
 };
 
-const login = (req, res) => {
-  let params = req.body;
+const login = async (req, res) => {
+  const { email, password } = req.body;
 
-  if (!params.email || !params.password) {
+  if (!email || !password) {
     return res.status(statusCode.data.ERROR.code).send(statusCode.data.ERROR);
   }
 
-  User.findOne({
-    email: params.email,
-  }).exec((err, user) => {
-    if (err || !user)
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
       return res
         .status(validations.user.NOTEXISTS.code)
         .send(validations.user.NOTEXISTS);
+    }
 
-    const pwd = bcrypt.compareSync(params.password, user.password);
+    const pwd = bcrypt.compareSync(password, user.password);
 
     if (!pwd) {
       return res
@@ -92,29 +85,31 @@ const login = (req, res) => {
       },
       token,
     });
-  });
+  } catch (error) {
+    console.log(error);
+    return res.status(validations.user.ERROR.code).send(validations.user.ERROR);
+  }
 };
 
-const update = (req, res) => {
-  let userIdentity = req.user;
-  let userToUpdate = req.body;
+const update = async (req, res) => {
+  try {
+    const userIdentity = req.user;
+    let userToUpdate = req.body;
 
-  delete userToUpdate.iat;
-  delete userToUpdate.exp;
-  delete userToUpdate.role;
+    delete userToUpdate.iat;
+    delete userToUpdate.exp;
+    delete userToUpdate.role;
 
-  User.find({
-    $or: [
-      { dni: userToUpdate.dni },
-      { surname: userToUpdate.surname.toLowerCase() },
-    ],
-  }).exec(async (err, users) => {
-    if (err) return res.status(querys.user.ERROR.code).json(querys.user.ERROR);
-
-    let userIsset = false;
-    users.forEach((user) => {
-      if (user && user._id != userIdentity.id) userIsset = true;
+    const existingUsers = await User.find({
+      $or: [
+        { dni: userToUpdate.dni },
+        { surname: userToUpdate.surname.toLowerCase() },
+      ],
     });
+
+    const userIsset = existingUsers.some(
+      (user) => user && user._id.toString() !== userIdentity.id
+    );
 
     if (userIsset) {
       return res
@@ -123,39 +118,42 @@ const update = (req, res) => {
     }
 
     if (userToUpdate.password) {
-      let pwd = await bcrypt.hash(userToUpdate.password, 10);
+      const pwd = await bcrypt.hash(userToUpdate.password, 10);
       userToUpdate.password = pwd;
     } else {
       delete userToUpdate.password;
     }
 
-    try {
-      let userUpdated = await User.findByIdAndUpdate(
-        { _id: userIdentity.id },
-        userToUpdate,
-        { new: true }
-      );
+    const userUpdated = await User.findOneAndUpdate(
+      { _id: userIdentity.id },
+      userToUpdate,
+      { new: true }
+    );
 
-      if (!userUpdated) {
-        return res
-          .status(validations.user.update.ERROR.code)
-          .json(validations.user.update.ERROR);
-      }
-
-      return res.status(validations.user.update.SUCCESS.code).send({
-        code: validations.user.update.SUCCESS.code,
-        status: validations.user.update.SUCCESS.status,
-        message: validations.user.update.SUCCESS.message,
-        user: userUpdated,
-      });
-    } catch (error) {
-      return res.status(querys.user.ERROR.code).send({
-        code: querys.user.ERROR.code,
-        status: validations.user.update.ERROR.status,
-        message: validations.user.update.ERROR.message,
-      });
+    if (!userUpdated) {
+      return res
+        .status(validations.user.update.ERROR.code)
+        .json(validations.user.update.ERROR);
     }
-  });
+
+    const userWithoutPassword = {
+      ...userUpdated.toObject(),
+      password: undefined,
+    };
+
+    return res.status(validations.user.update.SUCCESS.code).send({
+      code: validations.user.update.SUCCESS.code,
+      status: validations.user.update.SUCCESS.status,
+      message: validations.user.update.SUCCESS.message,
+      user: userWithoutPassword,
+    });
+  } catch (error) {
+    return res.status(querys.user.ERROR.code).send({
+      code: querys.user.ERROR.code,
+      status: validations.user.update.ERROR.status,
+      message: validations.user.update.ERROR.message,
+    });
+  }
 };
 
 export { register, login, update };

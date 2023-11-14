@@ -1,115 +1,84 @@
 import Client from "../models/client.js";
-import { validateClient } from "../helpers/validate.js";
 import { Global } from "../helpers/Global.js";
 
 const { statusCode, validations, querys } = Global;
 
-const register = (req, res) => {
+const register = async (req, res) => {
   let params = req.body;
 
   if (
-    !fullName ||
-    !customerNumber ||
-    !startDate ||
-    !phone ||
-    !address ||
-    !typeOfPayment ||
-    !amount
+    !params.fullName ||
+    !params.startDate ||
+    !params.phone ||
+    !params.address ||
+    !params.typeOfPayment ||
+    !params.amount
   ) {
     return res.status(statusCode.data.ERROR.code).json(statusCode.data.ERROR);
   }
 
   try {
-    validateClient(params);
-  } catch (e) {
-    return res
-      .status(validations.user.validation.ERROR.code)
-      .json(validations.user.validation.ERROR);
-  }
+    const existingClient = await Client.findOne({
+      $or: [{ customerNumber: params.customerNumber }],
+    });
 
-  Client.find({
-    $or: [{ customerNumber: params.customerNumber }],
-  }).exec(async (error, clients) => {
-    if (error)
-      return res.status(querys.user.ERROR.code).json(querys.user.ERROR);
-
-    if (clients && clients.length >= 1) {
+    if (existingClient) {
       return res
-        .status(validations.user.EXISTS.code)
-        .send(validations.user.EXISTS);
+        .status(validations.client.EXISTS.code)
+        .send(validations.client.EXISTS);
     }
 
     let client_to_save = new Client(params);
+    let clientStored = await client_to_save.save();
 
-    client_to_save.save((error, clientStored) => {
-      if (error || !clientStored)
-        return res
-          .status(validations.user.ERROR.code)
-          .send(validations.user.ERROR);
-
-      clientStored.toObject();
-
-      return res.status(validations.user.SUCCESS.code).json({
-        status: validations.user.SUCCESS.status,
-        message: validations.user.SUCCESS.message,
-        client: clientStored,
-      });
-    });
-  });
-};
-
-const update = (req, res) => {
-  let clientIdentity = req.user;
-  let clientToUpdate = req.body;
-
-  Client.find({
-    $or: [{ customerNumber: clientToUpdate.customerNumber }],
-  }).exec(async (err, clients) => {
-    if (err) return res.status(querys.user.ERROR.code).json(querys.user.ERROR);
-
-    let clientIsset = false;
-    clients.forEach((client) => {
-      if (client && client._id != clientIdentity.id) clientIsset = true;
-    });
-
-    if (clientIsset) {
+    if (!clientStored) {
       return res
-        .status(validations.user.EXISTS.code)
-        .send(validations.user.EXISTS);
+        .status(validations.client.ERROR.code)
+        .send(validations.client.ERROR);
     }
 
-    try {
-      let clientUpdated = await Client.findByIdAndUpdate(
-        { _id: clientIdentity.id },
-        clientToUpdate,
-        { new: true }
-      );
+    clientStored = clientStored.toObject();
 
-      if (!clientUpdated) {
-        return res
-          .status(validations.user.update.ERROR.code)
-          .json(validations.user.update.ERROR);
-      }
-
-      return res.status(validations.user.update.SUCCESS.code).send({
-        code: validations.user.update.SUCCESS.code,
-        status: validations.user.update.SUCCESS.status,
-        message: validations.user.update.SUCCESS.message,
-        client: clientUpdated,
-      });
-    } catch (error) {
-      return res.status(querys.user.ERROR.code).send({
-        code: querys.user.ERROR.code,
-        status: validations.user.update.ERROR.status,
-        message: validations.user.update.ERROR.message,
-      });
-    }
-  });
+    return res.status(validations.client.SUCCESS.code).json({
+      status: validations.client.SUCCESS.status,
+      message: validations.client.SUCCESS.message,
+      client: clientStored,
+    });
+  } catch (error) {
+    return res.status(querys.client.ERROR.code).json(querys.client.ERROR);
+  }
 };
 
-const getAllClient = (req, res) => {
+const update = async (req, res) => {
+  const customerNumber = req.params.customerNumber;
+  const clientToUpdate = req.body;
+
   try {
-    const clients = Client.find({});
+    const updatedClient = await Client.findOneAndUpdate(
+      { customerNumber: customerNumber },
+      clientToUpdate,
+      { new: true }
+    );
+
+    if (!updatedClient) {
+      return res
+        .status(validations.client.NOTEXISTS.code)
+        .json(validations.client.NOTEXISTS);
+    }
+
+    return res.status(validations.client.update.SUCCESS.code).json({
+      status: validations.client.update.SUCCESS.status,
+      message: validations.client.update.SUCCESS.message,
+      updatedClient: updatedClient,
+    });
+  } catch (error) {
+    return res.status(querys.task.ERROR.code).json(querys.task.ERROR);
+  }
+};
+
+const getAllClient = async (req, res) => {
+  try {
+    const clients = await Client.find({});
 
     return res.status(statusCode.SUCCESS.code).json({
       status: statusCode.SUCCESS.status,
@@ -122,40 +91,57 @@ const getAllClient = (req, res) => {
   }
 };
 
-const getClientById = (req, res) => {
-  let params = req.body;
+const getClientById = async (req, res) => {
+  let customerNumber = req.params.customerNumber;
 
   try {
-    Client.findOne({
-      customerNumber: params.customerNumber,
-    }).exec(async (error, client) => {
-      if (error)
-        return res.status(querys.user.ERROR.code).json(querys.user.ERROR);
-
-      if (client && client.length >= 1) {
-        return res.status(statusCode.SUCCESS.code).json({
-          status: statusCode.SUCCESS.status,
-          message: statusCode.SUCCESS.message,
-          client: client,
-        });
-      }
-
-      return res.status(statusCode.ERROR.code).json(statusCode.ERROR);
+    const existClient = await Client.findOne({
+      customerNumber: customerNumber,
     });
+
+    if (existClient) {
+      return res.status(statusCode.SUCCESS.code).json({
+        status: statusCode.SUCCESS.status,
+        message: statusCode.SUCCESS.message,
+        client: existClient,
+      });
+    } else {
+      return res.status(404).json({
+        status: "error",
+        message: "No se encontró el cliente, tal vez no exista.",
+      });
+    }
   } catch (err) {
-    console.error("Error al obtener el cliente por número:", err);
+    console.error("Error al obtener el cliente:", err);
     return res.status(statusCode.ERROR.code).json(statusCode.ERROR);
   }
 };
-// Borrar
 
-// prueba
-const testClient = (req, res) => {
-  return res.status(200).send({
-    status: "OK",
-    message: "Mensaje enviado desde controller/client.js",
-    client: req.user,
-  });
+const remove = async (req, res) => {
+  try {
+    const customerNumber = req.params.customerNumber;
+
+    const result = await Client.deleteOne({ customerNumber });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "No se encontró el cliente para eliminar",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "Cliente eliminado",
+      clientRemoved: customerNumber,
+    });
+  } catch (error) {
+    console.error("Error removing client:", error);
+    return res.status(500).json({
+      status: "error",
+      message: "No se ha eliminado el cliente",
+    });
+  }
 };
 
-export { testClient };
+export { register, getAllClient, getClientById, remove, update };

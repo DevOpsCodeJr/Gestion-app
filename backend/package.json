@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node index.js",
     "test": "echo 'Tests complete...'",
-    "dev": "node --watch --env-file .env index.js"
+    "dev": "node --watch index.js"
   },
   "author": "Anthony Guekdjian",
   "license": "MIT",

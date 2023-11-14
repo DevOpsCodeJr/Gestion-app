@@ -1,9 +1,15 @@
 import { Schema, model } from "mongoose";
 
 const TaskSchema = Schema({
+  user: {
+    name: String,
+    surname: String,
+  },
   client: {
-    type: Schema.ObjectId,
-    ref: "Client",
+    fullName: String,
+    customerNumber: Number,
+    address: String,
+    phone: Number,
   },
   issueDate: {
     type: Date,
