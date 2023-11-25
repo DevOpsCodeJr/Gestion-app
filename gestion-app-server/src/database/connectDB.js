@@ -6,7 +6,7 @@ const { database } = Global;
 const connectDB = async () => {
   try {
     set("strictQuery", false);
-    await connect(database.URI);
+    await connect(database.localURI);
     console.log(database.stateConnectionDB.SUCCESS);
   } catch (e) {
     console.log(e);

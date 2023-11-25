@@ -158,7 +158,7 @@ export const Global = {
   },
   database: {
     localURI:
-      "mongodb+srv://userdev:b5a1453zxk@gestion-app.1zassia.mongodb.net/?retryWrites=true&w=majority",
+      "mongodb+srv://aduekdjian:b5a1453zxk@cluster0.joombcu.mongodb.net/?retryWrites=true&w=majority",
     URI: `mongodb+srv://${process.env.USER_DB}:${process.env.PASSWORD_DB}@${process.env.NAME_DB}.1zassia.mongodb.net/?retryWrites=true&w=majority`,
     stateConnectionDB: {
       SUCCESS: `Conexion exitosa a base de datos: ${process.env.NAME_DB}!`,

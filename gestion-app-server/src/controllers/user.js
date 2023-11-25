@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import { createToken } from "../services/jwt.js";
 import User from "../models/user.js";
 import { Global } from "../helpers/Global.js";
+import cookie from "cookie";
 
 const { statusCode, validations, querys } = Global;
 
@@ -75,6 +76,16 @@ const login = async (req, res) => {
 
     const token = createToken(user);
 
+    res.setHeader(
+      "Set-Cookie",
+      cookie.serialize("Auth", token, {
+        maxAge: 360000,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production" ? true : false,
+        sameSite: "lax",
+      })
+    );
+
     return res.status(validations.user.identification.SUCCESS.code).send({
       status: validations.user.identification.SUCCESS.status,
       message: validations.user.identification.SUCCESS.message,
@@ -83,7 +94,6 @@ const login = async (req, res) => {
         name: user.name,
         dni: user.dni,
       },
-      token,
     });
   } catch (error) {
     console.log(error);

@@ -1,7 +1,7 @@
 import jwt from "jwt-simple";
 import moment from "moment";
 
-const secret = process.env.JWT_SECRET;
+const secret = "b5a1453zxk";
 
 const createToken = (user) => {
   const payload = {
