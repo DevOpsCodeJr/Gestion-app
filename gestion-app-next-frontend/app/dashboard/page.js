@@ -1,3 +1,7 @@
 export default function Dashboard() {
-  return <section>Dashboard</section>;
+  return (
+    <section >
+      Bienvenido a Gestion App
+    </section>
+  )
 }
