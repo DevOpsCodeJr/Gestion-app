@@ -1,15 +1,15 @@
-import { Injectable } from '@nestjs/common';
-import { CreateClientDto } from './dto/create-client.dto';
-import { UpdateClientDto } from './dto/update-client.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Client } from './entities/client.entity';
+import { Injectable } from "@nestjs/common";
+import { CreateClientDto } from "./dto/create-client.dto";
+import { UpdateClientDto } from "./dto/update-client.dto";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { Client } from "./entities/client.entity";
 
 @Injectable()
 export class ClientsService {
   constructor(
     @InjectRepository(Client)
-    private readonly clientRepository: Repository<Client>,
+    private readonly clientRepository: Repository<Client>
   ) {}
 
   async create(createClientDto: CreateClientDto) {
@@ -22,11 +22,11 @@ export class ClientsService {
   }
 
   async findOne(clientNumber: number) {
-    return await this.clientRepository.findOneBy({ clientNumber });
+    return await this.clientRepository.findOne({ where: { clientNumber } });
   }
 
-  async update(id: number, updateClientDto: UpdateClientDto) {
-    return `This action updates a #${id} client`;
+  async update(clientNumber: number, updateClientDto: UpdateClientDto) {
+    return await this.clientRepository.update(clientNumber, updateClientDto);
   }
 
   async remove(clientNumber: number) {

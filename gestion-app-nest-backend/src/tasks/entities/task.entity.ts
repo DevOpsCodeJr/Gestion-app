@@ -1,11 +1,11 @@
-import { Client } from 'src/clients/entities/client.entity';
+import { Client } from "src/clients/entities/client.entity";
 import {
   Column,
   DeleteDateColumn,
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
-} from 'typeorm';
+} from "typeorm";
 
 @Entity()
 export class Task {
@@ -30,6 +30,6 @@ export class Task {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @ManyToOne(() => Client, (client) => client.clientNumber, { eager: true })
+  @ManyToOne(() => Client, (client) => client.tasks, { eager: true })
   client: Client;
 }

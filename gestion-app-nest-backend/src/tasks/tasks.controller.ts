@@ -6,13 +6,12 @@ import {
   Put,
   Param,
   Delete,
-  Patch,
-} from '@nestjs/common';
-import { TasksService } from './tasks.service';
-import { CreateTaskDto } from './dto/create-task.dto';
-import { UpdateTaskDto } from './dto/update-task.dto';
+} from "@nestjs/common";
+import { TasksService } from "./tasks.service";
+import { CreateTaskDto } from "./dto/create-task.dto";
+import { UpdateTaskDto } from "./dto/update-task.dto";
 
-@Controller('tasks')
+@Controller("tasks")
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
@@ -26,18 +25,18 @@ export class TasksController {
     return this.tasksService.findAll();
   }
 
-  @Get(':orderNumber')
-  findOne(@Param('orderNumber') orderNumber: number) {
+  @Get(":orderNumber")
+  findOne(@Param("orderNumber") orderNumber: number) {
     return this.tasksService.findOne(orderNumber);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: number, @Body() updateTaskDto: UpdateTaskDto) {
+  @Put(":id")
+  update(@Param("id") id: number, @Body() updateTaskDto: UpdateTaskDto) {
     return this.tasksService.update(id, updateTaskDto);
   }
 
-  @Delete(':orderNumber')
-  remove(@Param('orderNumber') orderNumber: number) {
+  @Delete(":orderNumber")
+  remove(@Param("orderNumber") orderNumber: number) {
     return this.tasksService.remove(orderNumber);
   }
 }

@@ -1,11 +1,11 @@
-import { Task } from 'src/tasks/entities/task.entity';
+import { Task } from "src/tasks/entities/task.entity";
 import {
   Column,
   DeleteDateColumn,
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
-} from 'typeorm';
+} from "typeorm";
 
 @Entity()
 export class Client {
@@ -39,6 +39,6 @@ export class Client {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @OneToMany(() => Task, (task) => task.clientNumber, { eager: true })
+  @OneToMany(() => Task, (task) => task.client)
   tasks: Task[];
 }
