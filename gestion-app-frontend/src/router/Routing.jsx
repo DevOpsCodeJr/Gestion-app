@@ -1,9 +1,10 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import { PrivateLayout, PublicLayout } from "../components/layout";
+import { PrivateLayout, PublicLayout } from "../pages/layout";
 import { Login } from "../components/auth/Login";
 import { Logout } from "../components/auth/Logout";
 import { Error404 } from "../components/error/Error404";
+import { Layout } from "../components/layout/Layout";
 
 const Routing = () => {
   return (
@@ -15,6 +16,7 @@ const Routing = () => {
         </Route>
 
         <Route path="/dashboard" element={<PrivateLayout />}>
+          <Route index element={<Layout />} />
           <Route path="logout" element={<Logout />} />
         </Route>
 
