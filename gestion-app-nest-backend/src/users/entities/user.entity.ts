@@ -14,13 +14,16 @@ export class User {
   name: string;
 
   @Column({ unique: true, nullable: false })
+  dni: string;
+
+  @Column({ unique: true, nullable: false })
   email: string;
 
   @Column({ nullable: false })
   password: string;
 
   @Column({ default: "admin" })
-  rol: string;
+  role: string;
 
   @DeleteDateColumn()
   deletedAt: Date;

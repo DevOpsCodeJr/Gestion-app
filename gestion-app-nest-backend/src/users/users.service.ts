@@ -12,12 +12,12 @@ export class UsersService {
     private readonly usersRepository: Repository<User>
   ) {}
 
-  create(createUserDto: CreateUserDto) {
-    return this.usersRepository.save(createUserDto);
+  async create(createUserDto: CreateUserDto) {
+    return await this.usersRepository.save(createUserDto);
   }
 
-  findOneByEmail(email: string) {
-    return this.usersRepository.findOneBy({ email });
+  async findOneByEmail(email: string) {
+    return await this.usersRepository.findOneBy({ email });
   }
 
   findAll() {
@@ -28,8 +28,8 @@ export class UsersService {
     return `This action returns a #${id} user`;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(dni: string, updateUserDto: UpdateUserDto) {
+    return await this.usersRepository.update(dni, updateUserDto);
   }
 
   remove(id: number) {

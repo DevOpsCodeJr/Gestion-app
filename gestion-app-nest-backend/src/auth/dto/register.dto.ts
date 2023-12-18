@@ -7,6 +7,11 @@ export class RegisterDto {
   @MinLength(3)
   name: string;
 
+  @Transform(({ value }) => value.trim())
+  @IsString()
+  @MinLength(7)
+  dni: string;
+
   @IsEmail()
   email: string;
 
@@ -14,4 +19,8 @@ export class RegisterDto {
   @IsString()
   @MinLength(8)
   password: string;
+
+  @Transform(({ value }) => value.trim())
+  @IsString()
+  role: string;
 }
