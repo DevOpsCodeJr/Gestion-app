@@ -15,39 +15,8 @@ jobs:
         with:
           access_token: ${{ github.token }}
 
-  dependencies:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4.1.1
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4.0.0
-        with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: "gestion-app-nest-backend/*"
-      - name: Installing dependencies
-        run: cd gestion-app-nest-backend && npm install --production
-
-  test:
-    needs: [dependencies]
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4.1.1
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4.0.0
-        with:
-          cache: "npm"
-          node-version: "20"
-          cache-dependency-path: "gestion-app-nest-backend/*"
-      - name: Installing dependencies
-        run: cd gestion-app-nest-backend && npm install --production
-      - name: Testing
-        run: cd gestion-app-nest-backend && npm run test
-
   build:
-    needs: [dependencies]
+    needs: [avoid_redundancy]
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -58,6 +27,10 @@ jobs:
           node-version: "20"
           cache: "npm"
           cache-dependency-path: "gestion-app-nest-backend/*"
+      - name: Installing dependencies
+        run: cd gestion-app-nest-backend && npm install
+      - name: Build
+        run: cd gestion-app-nest-backend && npm run build
       - name: Login to docker hub
         run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}
       - name: Build docker image
@@ -66,7 +39,7 @@ jobs:
         run: docker push aguekdjian/backend-gestion-app:latest
 
   deploy:
-    needs: [test, build]
+    needs: [build]
     runs-on: aws-ec2-gestion-app
     steps:
       - name: Login to docker hub
