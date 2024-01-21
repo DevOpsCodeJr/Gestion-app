@@ -1,6 +1,6 @@
 import { ChevronFirst, MoreVertical, ChevronLast } from "lucide-react";
 import { useState, createContext, useContext, useEffect } from "react";
-import MiAlarma from "../../assets/imagen mi alarma.png";
+// import MiAlarma from "../../assets/imagen mi alarma.png";
 import { useAppContext } from "../../hooks/useAppContext";
 import { Link } from "react-router-dom";
 
@@ -34,13 +34,12 @@ export default function Sidebar({ children }) {
     <aside className="h-full w-max rounded-md pr-2">
       <nav className="h-full flex flex-col bg-white border-r shadow-sm rounded-3xl">
         <div className="p-4 pb-2 flex justify-between items-center">
-          <img
-            src={MiAlarma}
-            alt=""
+          {/* <img
+            alt="Logo de la empresa."
             className={`overflow-hidden transition-all ${
               expanded ? "w-14" : "w-0"
             } `}
-          />
+          /> */}
           <button
             onClick={() => setExpanded((curr) => !curr)}
             className="p-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-800"

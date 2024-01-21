@@ -25,3 +25,10 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+.modal-content,
+.modal-dialog,
+.modal-body {
+  border-radius: 20px !important;
+  border: none;
+}

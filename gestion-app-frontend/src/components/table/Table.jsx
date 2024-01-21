@@ -10,6 +10,8 @@ import {
 export const Table = ({ data, columns }) => {
   const [sorting, setSorting] = useState([]);
 
+  console.log(data);
+
   const table = useReactTable({
     data,
     columns,
@@ -50,20 +52,6 @@ export const Table = ({ data, columns }) => {
             </tr>
           ))}
         </tbody>
-        {/* <tfoot>
-          {table.getFooterGroups().map((footerGroup) => (
-            <tr key={footerGroup.id}>
-              {footerGroup.headers.map((footer) => (
-                <th key={footer.id}>
-                  {flexRender(
-                    footer.column.columnDef.footer,
-                    footer.getContext()
-                  )}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </tfoot> */}
       </table>
       <div>
         <button
